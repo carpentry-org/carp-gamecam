@@ -12,19 +12,9 @@ A high-performance 3D perspective camera for the Carp programming language.
 (load "https://github.com/sqrew/carp-gamecam@master")
 ```
 
-## Usage
-```clojure
-(use Camera)
-(use Vector3)
 
-;; Create a new camera
-(let [cam (Camera.new (Vector3.init 0.0 0.0 10.0) -90.0 0.0 1.77)]
-  (do
-    ;; Generate matrices for the GPU
-    (let [view (Camera.look-at &cam)
-          proj (Camera.perspective &cam)]
-      (println* "Ready for GPU upload!"))))
-```
+## Examples
 
+See [examples.md](examples.md) for usage examples.
 ## License
 MIT
