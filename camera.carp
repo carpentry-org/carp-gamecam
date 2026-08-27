@@ -6,79 +6,84 @@
 (deftype CameraMat4 [data (Array Float)])
 
 (defmodule CameraMat4
-  (defn zero [] (CameraMat4.init (Array.replicate 16 &0.0f)))
+  (defn zero [] (CameraMat4.init (Array.replicate 16 &0f)))
 
   (defn identity []
-    (let [m (Array.replicate 16 &0.0f)]
+    (let [m (Array.replicate 16 &0f)]
       (do
-        (Array.aset! &m 0  1.0f)
-        (Array.aset! &m 5  1.0f)
-        (Array.aset! &m 10 1.0f)
-        (Array.aset! &m 15 1.0f)
+        (Array.aset! &m 0 1f)
+        (Array.aset! &m 5 1f)
+        (Array.aset! &m 10 1f)
+        (Array.aset! &m 15 1f)
         (CameraMat4.init m))))
 
   (defn mul [a b]
     (let [m1 (CameraMat4.data a)
           m2 (CameraMat4.data b)
-          res (Array.replicate 16 &0.0f)]
+          res (Array.replicate 16 &0f)]
       (do
         (for [col 0 4]
           (for [row 0 4]
-            (let [sum 0.0f]
+            (let [sum 0f]
               (do
                 (for [k 0 4]
-                  (set! sum (+ sum (* @(Array.unsafe-nth m1 (+ (* k 4) row))
-                                      @(Array.unsafe-nth m2 (+ (* col 4) k))))))
+                  (set! sum
+                        (+ sum
+                           (* @(Array.unsafe-nth m1 (+ (* k 4) row))
+                              @(Array.unsafe-nth m2 (+ (* col 4) k))))))
                 (Array.aset! &res (+ (* col 4) row) sum)))))
-        (CameraMat4.init res))))
-)
+        (CameraMat4.init res)))))
 
 (doc Camera "represents a 3D perspective camera using the Basis Vector Pattern.")
-(deftype Camera [
-  pos (Vector3 Double)
-  front (Vector3 Double)
-  right (Vector3 Double)
-  up (Vector3 Double)
-  world-up (Vector3 Double)
-  yaw Double
-  pitch Double
-  fov Double
-  aspect Double
-  near Double
-  far Double
-])
+(deftype Camera
+  [pos (Vector3 Double)
+   front (Vector3 Double)
+   right (Vector3 Double)
+   up (Vector3 Double)
+   world-up (Vector3 Double)
+   yaw Double
+   pitch Double
+   fov Double
+   aspect Double
+   near Double
+   far Double])
 
 (defmodule Camera
-  (defn- rad [deg] (* deg 0.0174532925))
-  (defn- deg [rad] (* rad 57.2957795))
+  (defn- rad [deg] (* deg 0.017453292499999998))
+  (defn- deg [rad] (* rad 57.295779500000002))
 
-  (doc update-basis! "recalculates the basis vectors (front, right, up) from yaw and pitch.")
+  (doc update-basis!
+    "recalculates the basis vectors (front, right, up) from yaw and pitch.")
   (defn update-basis! [c]
     (let [y (Camera.rad @(Camera.yaw c))
           p (Camera.rad @(Camera.pitch c))
-          f (Vector3.normalize &(Vector3.init (* (cos y) (cos p)) (sin p) (* (sin y) (cos p))))
+          f (Vector3.normalize
+            &(Vector3.init (* (cos y) (cos p)) (sin p) (* (sin y) (cos p))))
           r (Vector3.normalize &(Vector3.cross &f (Camera.world-up c)))
           u (Vector3.normalize &(Vector3.cross &r &f))]
-      (do
-        (Camera.set-front! c f)
-        (Camera.set-right! c r)
-        (Camera.set-up! c u))))
+      (do (Camera.set-front! c f) (Camera.set-right! c r) (Camera.set-up! c u))))
 
   (doc new "creates a new Fly-Cam at pos with initial orientation.")
   (defn new [pos yaw pitch aspect]
-    (let [c (Camera.init pos (Vector3.init 0.0 0.0 0.0) (Vector3.init 0.0 0.0 0.0) (Vector3.init 0.0 0.0 0.0) (Vector3.init 0.0 1.0 0.0)
-                         yaw pitch 60.0 aspect 0.1 100.0)]
-      (do
-        (Camera.update-basis! &c)
-        c)))
+    (let [c (Camera.init pos
+                         (Vector3.init 0.0 0.0 0.0)
+                         (Vector3.init 0.0 0.0 0.0)
+                         (Vector3.init 0.0 0.0 0.0)
+                         (Vector3.init 0.0 1.0 0.0)
+                         yaw
+                         pitch
+                         60.0
+                         aspect
+                         0.1
+                         100.0)]
+      (do (Camera.update-basis! &c) c)))
 
   (doc update-yaw! "sets the yaw and updates the internal basis vectors.")
   (defn update-yaw! [c val]
-    (do
-      (Camera.set-yaw! c val)
-      (Camera.update-basis! c)))
+    (do (Camera.set-yaw! c val) (Camera.update-basis! c)))
 
-  (doc update-pitch! "sets the pitch (clamped -89 to 89) and updates the internal basis vectors.")
+  (doc update-pitch!
+    "sets the pitch (clamped -89 to 89) and updates the internal basis vectors.")
   (defn update-pitch! [c val]
     (do
       (Camera.set-pitch! c (Double.clamp -89.0 89.0 val))
@@ -88,7 +93,8 @@
   (defn rotate! [c dyaw dpitch]
     (do
       (Camera.set-yaw! c (+ @(Camera.yaw c) dyaw))
-      (Camera.set-pitch! c (Double.clamp -89.0 89.0 (+ @(Camera.pitch c) dpitch)))
+      (Camera.set-pitch! c
+                         (Double.clamp -89.0 89.0 (+ @(Camera.pitch c) dpitch)))
       (Camera.update-basis! c)))
 
   (doc look-at-point! "orients the camera to face a target point in space.")
@@ -121,16 +127,19 @@
 
   (doc perspective "generates a 4x4 projection matrix (WGPU/D3D style).")
   (defn perspective [c]
-    (let [f (/ 1.0f (the Float (Double.to-float (tan (* @(Camera.fov c) 0.00872664625)))))
+    (let [f (/ 1f
+               (the Float
+                    (Double.to-float
+                      (tan (* @(Camera.fov c) 0.0087266462499999992)))))
           a (the Float (Double.to-float @(Camera.aspect c)))
           n (the Float (Double.to-float @(Camera.near c)))
           far (the Float (Double.to-float @(Camera.far c)))
-          m (Array.replicate 16 &0.0f)]
+          m (Array.replicate 16 &0f)]
       (do
         (Array.aset! &m 0 (/ f a))
         (Array.aset! &m 5 f)
         (Array.aset! &m 10 (/ far (- n far)))
-        (Array.aset! &m 11 -1.0f)
+        (Array.aset! &m 11 -1f)
         (Array.aset! &m 14 (/ (* far n) (- n far)))
         (CameraMat4.init m))))
 
@@ -140,26 +149,29 @@
           s (Camera.right c)
           u (Camera.up c)
           p (Camera.pos c)
-          m (Array.replicate 16 &0.0f)]
+          m (Array.replicate 16 &0f)]
       (do
         (Array.aset! &m 0 (the Float (Double.to-float @(Vector3.x s))))
         (Array.aset! &m 4 (the Float (Double.to-float @(Vector3.y s))))
         (Array.aset! &m 8 (the Float (Double.to-float @(Vector3.z s))))
-        
+
         (Array.aset! &m 1 (the Float (Double.to-float @(Vector3.x u))))
         (Array.aset! &m 5 (the Float (Double.to-float @(Vector3.y u))))
         (Array.aset! &m 9 (the Float (Double.to-float @(Vector3.z u))))
-        
+
         (Array.aset! &m 2 (the Float (Double.to-float (- 0.0 @(Vector3.x f)))))
         (Array.aset! &m 6 (the Float (Double.to-float (- 0.0 @(Vector3.y f)))))
         (Array.aset! &m 10 (the Float (Double.to-float (- 0.0 @(Vector3.z f)))))
-        
-        (Array.aset! &m 12 (the Float (Double.to-float (- 0.0 (Vector3.dot s p)))))
-        (Array.aset! &m 13 (the Float (Double.to-float (- 0.0 (Vector3.dot u p)))))
+
+        (Array.aset! &m
+                     12
+                     (the Float (Double.to-float (- 0.0 (Vector3.dot s p)))))
+        (Array.aset! &m
+                     13
+                     (the Float (Double.to-float (- 0.0 (Vector3.dot u p)))))
         (Array.aset! &m 14 (the Float (Double.to-float (Vector3.dot f p))))
-        (Array.aset! &m 15 1.0f)
+        (Array.aset! &m 15 1f)
         (CameraMat4.init m))))
 
   (defn view-projection [c]
-    (CameraMat4.mul &(Camera.perspective c) &(Camera.look-at c)))
-)
+    (CameraMat4.mul &(Camera.perspective c) &(Camera.look-at c))))

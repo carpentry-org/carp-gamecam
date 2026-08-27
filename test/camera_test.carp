@@ -11,10 +11,26 @@
       (let [m (CameraMat4.identity)
             data (CameraMat4.data &m)]
         (do
-          (set! state (Test.assert-equal &state 1.0f @(Array.unsafe-nth data 0)  "Identity [0] is 1"))
-          (set! state (Test.assert-equal &state 1.0f @(Array.unsafe-nth data 5)  "Identity [5] is 1"))
-          (set! state (Test.assert-equal &state 1.0f @(Array.unsafe-nth data 10) "Identity [10] is 1"))
-          (set! state (Test.assert-equal &state 1.0f @(Array.unsafe-nth data 15) "Identity [15] is 1"))))
+          (set! state
+                (Test.assert-equal &state
+                                   1f
+                                   @(Array.unsafe-nth data 0)
+                                   "Identity [0] is 1"))
+          (set! state
+                (Test.assert-equal &state
+                                   1f
+                                   @(Array.unsafe-nth data 5)
+                                   "Identity [5] is 1"))
+          (set! state
+                (Test.assert-equal &state
+                                   1f
+                                   @(Array.unsafe-nth data 10)
+                                   "Identity [10] is 1"))
+          (set! state
+                (Test.assert-equal &state
+                                   1f
+                                   @(Array.unsafe-nth data 15)
+                                   "Identity [15] is 1"))))
 
       ;; Camera Test
       (let [pos (Vector3.init 0.0 0.0 10.0)
@@ -22,7 +38,15 @@
             view (Camera.look-at &cam)
             proj (Camera.perspective &cam)]
         (do
-          (set! state (Test.assert-equal &state 16 (Array.length (CameraMat4.data &view)) "View matrix has 16 elements"))
-          (set! state (Test.assert-equal &state 16 (Array.length (CameraMat4.data &proj)) "Proj matrix has 16 elements"))))
-      
+          (set! state
+                (Test.assert-equal &state
+                                   16
+                                   (Array.length (CameraMat4.data &view))
+                                   "View matrix has 16 elements"))
+          (set! state
+                (Test.assert-equal &state
+                                   16
+                                   (Array.length (CameraMat4.data &proj))
+                                   "Proj matrix has 16 elements"))))
+
       state)))
