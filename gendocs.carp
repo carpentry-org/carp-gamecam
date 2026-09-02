@@ -1,0 +1,26 @@
+(load "carp-gamecam.carp")
+
+(Project.config "title" "carp-gamecam")
+(Project.config "docs-directory" "./docs/")
+(Project.config "docs-logo" "")
+(Project.config "docs-url" "https://github.com/carpentry-org/carp-gamecam")
+(Project.config "docs-styling" "../style.css")
+(Project.config "docs-prelude" "A 3D perspective camera for Carp.
+
+```
+(load \"git@github.com:carpentry-org/carp-gamecam@master\")
+```
+
+- [`Camera`](./Camera.html) — position and orientation held as basis vectors,
+  with yaw/pitch for fly-cam navigation, producing view and projection matrices
+- [`CameraMat4`](./CameraMat4.html) — a 4x4 matrix, column-major
+
+Matrices come out column-major, which is what WGPU and the other modern
+graphics APIs want, so they can go straight into a uniform buffer with no
+transpose. Vectors are carp's own `Vector3`.")
+
+(save-docs Camera CameraMat4)
+; Carp's save-docs hardcodes the index filename as <title>_index.html.
+; Rename to docs/index.html.
+(defn main []
+  (System.system "mv ./docs/carp-gamecam_index.html ./docs/index.html"))

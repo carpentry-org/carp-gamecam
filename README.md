@@ -9,12 +9,13 @@ A high-performance 3D perspective camera for the Carp programming language.
 
 ## Installation
 ```clojure
-(load "https://github.com/sqrew/carp-gamecam@master")
+(load "git@github.com:carpentry-org/carp-gamecam@master")
 ```
 
 
 ## Examples
 
-See [examples.md](examples.md) for usage examples.
+See [examples.md](examples.md) for usage examples, and the
+[API documentation](https://carpentry.dev/carp-gamecam) for the full reference.
 ## License
 MIT
